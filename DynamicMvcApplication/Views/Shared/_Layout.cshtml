@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewBag.Title - My ASP.NET MVC Application</title>
+        <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width" />
+        @Styles.Render("~/Content/css")
+        @Styles.Render("~/Content/themes/base/css")
+        @Scripts.Render("~/bundles/modernizr")
+    </head>
+    <body>
+        <header>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p class="site-title">@Html.ActionLink("your logo here", "Index", "Home")</p>
+                </div>
+                <div class="float-right">
+                    <section id="login">
+                        @Html.Partial("_LoginPartial")
+                    </section>
+                    <nav>
+                        <ul id="menu">
+                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                            <li>@Html.ActionLink("About", "About", "Home")</li>
+                            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <div id="my-dialog" style="display:none;">
+            <div id="my-dialog-progress"><img src="@Url.Content("~/Content/ajax-loader.gif")" alt="loading" class="ui-loading-icon"></div>
+        </div>
+        <div id="body">
+            <section class="content-wrapper main-content clear-fix" id="bodySection">
+                @RenderBody()
+            </section>
+        </div>
+        <footer>
+            <div class="content-wrapper">
+                <div class="float-left">
+                    <p>&copy; @DateTime.Now.Year - My ASP.NET MVC Application</p>
+                </div>
+            </div>
+        </footer>
+
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        @RenderSection("scripts", required: false)
+        
+        <script type="text/javascript">
+            $(function () {
+                var theDialog = $('#my-dialog').dialog({
+                    autoOpen: false,
+                    modal: true,
+                    closeOnEscape: false,
+                    width: 50,
+                    show: 'fade',
+                    hide: 'fade',
+                    resizable: 'false'
+                });
+                
+                function loadUrl(url, success) {
+                    theDialog.dialog('open');
+                    $.ajax({
+                        url: url,
+                        method: "GET",
+                        cache: false
+                    }).success(function(data) {
+                        success(data);
+                    }).done(function() {
+                        theDialog.dialog('close');
+                    });
+                }
+
+                $("a").click(function () {
+                    var url = $(this).attr("href");
+                    loadUrl(url, function (data) {
+                        var stateObj = { foo: "bar" };
+                        history.pushState(stateObj, "", url);
+                        $("#bodySection").html(data);
+                    });
+                    return false;
+                });
+
+                window.onpopstate = function (event) {
+                    console.log('poped');
+                    loadUrl(window.location.href, function(data) {
+                        $("#bodySection").html(data);
+                    });
+                    event.preventDefault();
+                };
+            });
+        </script>
+
+    </body>
+</html>
